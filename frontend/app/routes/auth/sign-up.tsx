@@ -28,8 +28,9 @@ const SignUp = () => {
 
   const handleOnSubmit = (values: SignUpFormData) => {
     mutate(values, {
-      onSuccess: () => {
-        toast.success('Account created successfully! Please sign in.')
+      onSuccess: (data:any) => {
+      
+        toast.success(data.message)
       },
       onError: (error: any) => {
         const errorMessage = error.response?.data?.message || 'Something went wrong. Please try again.'

@@ -7,7 +7,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
+import { useLoginMutation } from '@/hooks/use-auth'
+import { toast } from 'sonner'
+import { useAuth } from '@/provider/auth-context'
+import { Loader2 } from 'lucide-react'
 
 type SignInFormData = z.infer<typeof signInSchema>
 
@@ -20,8 +24,25 @@ const SignIn = () => {
     },
   })
 
+  const { mutate, isPending} = useLoginMutation();
+ const navigate = useNavigate()
+ const {login} = useAuth();
   const handleOnSubmit = (values: SignInFormData) => {
-    console.log(values)
+    mutate(values,{
+      onSuccess:(data:any)=>{
+        console.log(data)
+        login(data);
+        toast.success("Login successfull");
+        navigate("/dashboard")
+      },
+      onError:(error:any)=>{
+        const errorMessage = error.response?.data?.message || "An error occurred";
+
+        console.log(error)
+
+        toast.error(errorMessage)
+      }
+    })
   }
 
   return <div className='min-h-screen flex items-center justify-center bg-muted/40 p-4'>
@@ -62,8 +83,9 @@ const SignIn = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="w-full" >
-              Sign In
+            <Button type="submit" className="w-full" disabled={isPending} >
+              {isPending ? <Loader2 className='w-4 h-4 mr-2'/> : "Sign in"}
+              
             </Button>
           </form>
         </Form>
