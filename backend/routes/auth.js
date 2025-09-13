@@ -6,12 +6,17 @@ import {
   loginSchema,
   registerSchema,
   verifyEmailSchema,
+  emailSchema,
+  resetPasswordSchema
 } from "../libs/validate-schema.js";
 import {
   loginUser,
   registerUser,
+  resetPasswordRequest,
   verifyEmail,
+  verifyResetPasswordTokenAndResetPassword,
 } from "../controllers/authController.js";
+
 
 const router = express.Router();
 
@@ -34,5 +39,18 @@ router.post(
   validateRequest({ body: verifyEmailSchema }),
   verifyEmail
 );
+
+router.post(
+  "/reset-password-request", validateRequest({
+    body: emailSchema
+  }),
+  resetPasswordRequest
+)
+
+router.post(
+  "/reset-password", validateRequest({
+    body: resetPasswordSchema
+  }), verifyResetPasswordTokenAndResetPassword
+)
 
 export default router;

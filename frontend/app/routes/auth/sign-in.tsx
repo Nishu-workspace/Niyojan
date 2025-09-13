@@ -107,7 +107,7 @@ const SignIn = () => {
                       <Input
                         type="password"
                         placeholder="********"
-                        {...field}
+                        {...field} autoComplete="new-password"
                       />
                     </FormControl>
                     <FormMessage />
