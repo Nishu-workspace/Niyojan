@@ -59,7 +59,7 @@ const Workspaces = () => {
 };
 const WorkspaceCard = ({ workspace }: { workspace: Workspace }) => {
   return (
-    <Link to={`/workspace/${workspace._id}`}>
+    <Link to={`/workspaces/${workspace._id}`}>
       <Card className="transition-all hover:shadow-md hover:shadow-ms hover:-trasnlate-y-1">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
