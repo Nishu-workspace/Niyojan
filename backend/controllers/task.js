@@ -1,5 +1,6 @@
-import Project from "../models/projects";
-import Workspace from "../models/workspace";
+import Project from "../models/projects.js";
+import Task from "../models/task.js";
+import Workspace from "../models/workspace.js";
 
 const createTask = async (req, res) => {
   try {
@@ -57,3 +58,5 @@ const createTask = async (req, res) => {
     });
   }
 };
+
+export { createTask };

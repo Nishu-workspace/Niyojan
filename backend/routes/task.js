@@ -3,6 +3,7 @@ import { validateRequest } from "zod-express-middleware";
 import authMiddleware from "../middleware/auth-middleware.js";
 import z from "zod";
 import { taskSchema } from "../libs/validate-schema.js";
+import { createTask } from "../controllers/task.js";
 
 const router = express.Router();
 
