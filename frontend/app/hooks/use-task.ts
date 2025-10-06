@@ -141,7 +141,63 @@ export const useUpdateSubTaskMutation = () => {
     },
   });
 };
+export const useAddCommentMutation = () => {
+  const queryClient = useQueryClient();
 
+  return useMutation({
+    mutationFn: (data: { taskId: string; text: string }) =>
+      postData(`/tasks/${data.taskId}/add-comment`, { text: data.text }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["comments", data.task],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data.task],
+      });
+    },
+  });
+};
+
+export const useGetCommentsByTaskIdQuery = (taskId: string) => {
+  return useQuery({
+    queryKey: ["comments", taskId],
+    queryFn: () => fetchData(`/tasks/${taskId}/comments`),
+  });
+};
+
+export const useWatchTaskMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string }) =>
+      postData(`/tasks/${data.taskId}/watch`, {}),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+
+export const useAchievedTaskMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string }) =>
+      postData(`/tasks/${data.taskId}/achieved`, {}),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
 export const useCreateDescriptionMutation = ()=>{
     const queryClient = useQueryClient();
 

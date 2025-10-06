@@ -1,4 +1,5 @@
 import { BackButton } from "@/components/back-button";
+import { CommentSection } from "@/components/tasks/comment-section";
 import { SubTasksDetails } from "@/components/tasks/sub-tasks";
 import { TaskActivity } from "@/components/tasks/task-activity";
 import { TaskAssigneesSelector } from "@/components/tasks/task-assignees-selector";
@@ -9,13 +10,18 @@ import { TaskTitle } from "@/components/tasks/task-title";
 import { Watchers } from "@/components/tasks/watchers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useTaskByIdQuery } from "@/hooks/use-task";
+import {
+  useAchievedTaskMutation,
+  useTaskByIdQuery,
+  useWatchTaskMutation,
+} from "@/hooks/use-task";
 import { useAuth } from "@/provider/auth-context";
 import type { Project, Task } from "@/types";
 import { formatDistanceToNow } from "date-fns";
 import { Eye, EyeOff, Loader } from "lucide-react";
 import React from "react";
 import { useNavigate, useParams } from "react-router";
+import { toast } from "sonner";
 
 const TaskDetails = () => {
   const { user } = useAuth();
@@ -47,6 +53,9 @@ const TaskDetails = () => {
       </div>
     );
   }
+  const { mutate: watchTask, isPending: isWatching } = useWatchTaskMutation();
+  const { mutate: achievedTask, isPending: isAchieved } =
+    useAchievedTaskMutation();
 
   const { task, project } = data;
   const isUserWatching = task?.watchers?.some(
@@ -55,6 +64,34 @@ const TaskDetails = () => {
 
   const goBack = () => navigate(-1);
   const members = task?.assignees || [];
+
+  const handleWatchTask = () => {
+    watchTask(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Task Watched");
+        },
+        onError: () => {
+          toast.error("Failed to watch task");
+        },
+      }
+    );
+  };
+
+  const handleAchievedTask = () => {
+    achievedTask(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Task achieved");
+        },
+        onError: () => {
+          toast.error("Failed to archive task");
+        },
+      }
+    );
+  };
   return (
     <div className="container mx-auto p-0 py-4 md:px-4">
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
@@ -71,8 +108,9 @@ const TaskDetails = () => {
           <Button
             variant={"outline"}
             size={"sm"}
-            onClick={() => {}}
+            onClick={handleWatchTask}
             className="w-fit"
+            disabled={isWatching}
           >
             {isUserWatching ? (
               <>
@@ -87,8 +125,9 @@ const TaskDetails = () => {
           <Button
             variant={"outline"}
             size={"sm"}
-            onClick={() => {}}
+            onClick={handleAchievedTask}
             className="w-fit"
+            disabled={isAchieved}
           >
             {task.isArchived ? "Unarchived" : "Archived"}
           </Button>
@@ -150,6 +189,7 @@ const TaskDetails = () => {
 
             <SubTasksDetails subTasks={task.subtasks || []} taskId={task._id} />
           </div>
+          <CommentSection taskId={task._id} members={project.members as any} />
         </div>
         {/* right side */}
 
