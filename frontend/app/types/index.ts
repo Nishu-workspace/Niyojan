@@ -57,7 +57,7 @@ export enum ProjectMemberRole {
   VIEWER = "viewer"
 }
 
-export interface Substask {
+export interface Subtask {
   _id:string;
   title:string;
   completed: boolean;
@@ -87,7 +87,7 @@ export interface Task {
   assignee: User | string;
   createdBy: User | string;
   assignees: User[];
-  subtasks?: Substask[];
+  subtasks?: Subtask[];
   watchers?:User[];
   attachments?: Attachment[];
 }

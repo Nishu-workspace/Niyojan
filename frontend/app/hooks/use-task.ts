@@ -1,6 +1,7 @@
 import type { CreateTaskFormData } from "@/components/tasks/create-task-dialog";
-import { postData } from "@/lib/fetch-util";
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { fetchData, postData, updateData } from "@/lib/fetch-util";
+import type { TaskPriority, TaskStatus } from "@/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 export const useCreateTaskMutation = ()=>{
     const queryClient = useQueryClient();
@@ -12,5 +13,139 @@ export const useCreateTaskMutation = ()=>{
                 queryKey:["project", data.project],
             })
         }
+    })
+}
+
+export const useTaskByIdQuery = (taskId: string)=>{
+    return useQuery({
+queryKey: ["task", taskId],
+queryFn: ()=> fetchData(`/tasks/${taskId}`)
+    })
+}
+
+export const useUpdateTaskTitleMutation = ()=>{
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationFn: (data:{ taskId: string; title:string})=>
+            updateData(`/tasks/${data.taskId}/title`, {title: data.title}),
+        onSuccess: (data:any)=>{
+            queryClient.invalidateQueries({
+                queryKey:["task", data._id]
+            })
+        }
+    })
+}
+
+export const useUpdateTaskStatusMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; status: TaskStatus }) =>
+      updateData(`/tasks/${data.taskId}/status`, { status: data.status }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+export const useUpdateTaskDescriptionMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; description: string }) =>
+      updateData(`/tasks/${data.taskId}/description`, {
+        description: data.description,
+      }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+
+export const useUpdateTaskAssigneesMutation = ()=>{
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: (data: {taskId: string; assignees: string[]})=>
+            updateData(`/tasks/${data.taskId}/assignees`,{assignees: data.assignees}),
+            onSuccess: (data: any)=>{
+                queryClient.invalidateQueries({
+                    queryKey:["task", data._id]
+                })
+            }
+        
+    })
+}
+
+export const useUpdateTaskPriorityMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; priority: TaskPriority }) =>
+      updateData(`/tasks/${data.taskId}/priority`, { priority: data.priority }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+
+export const useAddSubTaskMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { taskId: string; title: string }) =>
+      postData(`/tasks/${data.taskId}/add-subtask`, { title: data.title }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+
+export const useUpdateSubTaskMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: {
+      taskId: string;
+      subTaskId: string;
+      completed: boolean;
+    }) =>
+      updateData(`/tasks/${data.taskId}/update-subtask/${data.subTaskId}`, {
+        completed: data.completed,
+      }),
+    onSuccess: (data: any) => {
+      queryClient.invalidateQueries({
+        queryKey: ["task", data._id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["task-activity", data._id],
+      });
+    },
+  });
+};
+
+export const useCreateDescriptionMutation = ()=>{
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn:(data: {taskId: string; description: string})=> updateData(`/tasks/${data.taskId}/description`, {description: data.description})
     })
 }

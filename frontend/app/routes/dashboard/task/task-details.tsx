@@ -1,0 +1,165 @@
+import { BackButton } from "@/components/back-button";
+import { SubTasksDetails } from "@/components/tasks/sub-tasks";
+import { TaskActivity } from "@/components/tasks/task-activity";
+import { TaskAssigneesSelector } from "@/components/tasks/task-assignees-selector";
+import { TaskDescription } from "@/components/tasks/task-description";
+import { TaskPrioritySelector } from "@/components/tasks/task-priority-selector";
+import { TaskStatusSelector } from "@/components/tasks/task-status-selector";
+import { TaskTitle } from "@/components/tasks/task-title";
+import { Watchers } from "@/components/tasks/watchers";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useTaskByIdQuery } from "@/hooks/use-task";
+import { useAuth } from "@/provider/auth-context";
+import type { Project, Task } from "@/types";
+import { formatDistanceToNow } from "date-fns";
+import { Eye, EyeOff, Loader } from "lucide-react";
+import React from "react";
+import { useNavigate, useParams } from "react-router";
+
+const TaskDetails = () => {
+  const { user } = useAuth();
+  const { taskId, projectId, workspaceId } = useParams<{
+    taskId: string;
+    projectId: string;
+    workspaceId: string;
+  }>();
+
+  const navigate = useNavigate();
+  const { data, isLoading } = useTaskByIdQuery(taskId!) as {
+    data: {
+      task: Task;
+      project: Project;
+    };
+    isLoading: boolean;
+  };
+  if (isLoading) {
+    return (
+      <div>
+        <Loader />
+      </div>
+    );
+  }
+  if (!data) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-2xl font-bold">Task not found</div>
+      </div>
+    );
+  }
+
+  const { task, project } = data;
+  const isUserWatching = task?.watchers?.some(
+    (watcher) => watcher._id.toString() === user?._id.toString()
+  );
+
+  const goBack = () => navigate(-1);
+  const members = task?.assignees || [];
+  return (
+    <div className="container mx-auto p-0 py-4 md:px-4">
+      <div className="flex flex-col md:flex-row items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center">
+          <BackButton />
+          <h1 className="text-xl md:text-2xl font-bold">{task.title}</h1>
+          {task.isArchived && (
+            <Badge className="ml-2" variant={"outline"}>
+              Archived
+            </Badge>
+          )}
+        </div>
+        <div className="flex space-x-2 mt-4 md:mt-0">
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            onClick={() => {}}
+            className="w-fit"
+          >
+            {isUserWatching ? (
+              <>
+                <EyeOff className="mr-2 size-4" /> Unwatch
+              </>
+            ) : (
+              <>
+                <Eye className="mr-2 size-4" /> Watch
+              </>
+            )}
+          </Button>
+          <Button
+            variant={"outline"}
+            size={"sm"}
+            onClick={() => {}}
+            className="w-fit"
+          >
+            {task.isArchived ? "Unarchived" : "Archived"}
+          </Button>
+        </div>
+      </div>
+      <div className="flex flex-col lg:flex-row gap-6">
+        <div className="lg:col-span-2">
+          <div className="bg-card rounded-lg p-6 shadow-sm mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start mb-4">
+              <div>
+                <Badge
+                  variant={
+                    task.priority === "High"
+                      ? "destructive"
+                      : task.priority === "Medium"
+                        ? "default"
+                        : "outline"
+                  }
+                  className="mb-2 capitalize"
+                >
+                  {task.priority}Priority
+                </Badge>
+                <TaskTitle title={task.title} taskId={task._id} />
+                <div className="text-sm md:text-base text-muted-foreground">
+                  Created at:{" "}
+                  {formatDistanceToNow(new Date(task.createdAt), {
+                    addSuffix: true,
+                  })}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-4 md:mt-0">
+                <TaskStatusSelector status={task.status} taskId={task._id} />
+                <Button
+                  variant={"destructive"}
+                  size={"sm"}
+                  onClick={() => {}}
+                  className="hidden md:block"
+                >
+                  Delete Task
+                </Button>
+              </div>
+            </div>
+            <div className="mb-6">
+              <h3 className="text-sm font-medium text-muted-foreground mb-0">
+                Description
+              </h3>
+              <TaskDescription
+                description={task.description || ""}
+                taskId={task._id}
+              />
+            </div>
+            <TaskAssigneesSelector
+              task={task}
+              assignees={task.assignees}
+              projectMembers={project.members as any}
+            />
+
+            <TaskPrioritySelector priority={task.priority} taskId={task._id} />
+
+            <SubTasksDetails subTasks={task.subtasks || []} taskId={task._id} />
+          </div>
+        </div>
+        {/* right side */}
+
+        <div className="w-full">
+          <Watchers watchers={task.watchers || []} />
+          <TaskActivity resourceId={task._id} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default TaskDetails;

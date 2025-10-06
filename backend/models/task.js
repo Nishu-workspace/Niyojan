@@ -34,7 +34,7 @@ const taskSchema = new mongoose.Schema(
     estimatedHours: { type: Number, min: 0 },
     actualHours: { type: Number, min: 0 },
     tags: [{ type: String }],
-    substasks: [
+    subtasks: [
       {
         title: {
           type: String,
