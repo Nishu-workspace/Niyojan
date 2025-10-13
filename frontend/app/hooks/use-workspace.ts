@@ -19,6 +19,12 @@ export const useGetWorkspaceQuery = (workspaceId: string)=> {
     return useQuery({
         queryKey: ["workspace", workspaceId],
         queryFn: async()=> fetchData(`/workspaces/${workspaceId}/projects`),
+    //     staleTime: 0, // always considered stale
+    //  gcTime: 0,
+    // refetchOnMount: true,
+    // refetchOnWindowFocus: true,
+    // refetchOnReconnect: true,
+    
     })
 }
 

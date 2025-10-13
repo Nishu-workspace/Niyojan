@@ -81,6 +81,7 @@ const getWorkspaceProjects = async (req, res) => {
     const projects = await Project.find({
       workspace: workspaceId,
       isArchived: false,
+      // "members.users": req.user._id,
       // members: { $in: [req.user._id] },
     })
       // .populate("tasks", "status")
@@ -416,12 +417,12 @@ const acceptGenerateInvite = async (req, res) => {
         message: "Workspace not found",
       });
     }
-
+    console.log(req.user);
     const isMember = workspace.members.some(
       (member) => member.user.toString() === req.user._id.toString()
     );
 
-    if (!isMember) {
+    if (isMember) {
       return res.status(400).json({
         message: "You are already a member of this workspace",
       });
@@ -454,7 +455,7 @@ const acceptInviteByToken = async (req, res) => {
   try {
     const { token } = req.body;
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
+    console.log("decoded info", decoded);
     const { user, workspaceId, role } = decoded;
     const workspace = await Workspace.findById(workspaceId);
     if (!workspace) {
@@ -466,7 +467,7 @@ const acceptInviteByToken = async (req, res) => {
       (member) => member.user.toString() === user.toString()
     );
 
-    if (!isMember) {
+    if (isMember) {
       return res.status(400).json({
         message: "User already a member of this workspace",
       });
