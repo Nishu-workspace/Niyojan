@@ -628,6 +628,7 @@ const achievedTask = async (req, res) => {
 
 const getMyTasks = async (req, res) => {
   try {
+    console.log("request", req);
     const tasks = await Task.find({ assignees: { $in: [req.user._id] } })
       .populate("project", "title workspace")
       .sort({ createdAt: -1 });

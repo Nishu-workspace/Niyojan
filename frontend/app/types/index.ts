@@ -16,7 +16,7 @@ export interface Workspace {
   owner: User | string;
   color: string;
   members: {
-    user: User | string;
+    user: User ;
     role:"admin" | "member" | "owner" | "veiwer";
     joinedAt: Date;
   }[];

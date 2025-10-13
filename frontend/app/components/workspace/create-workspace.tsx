@@ -64,7 +64,7 @@ export const CreateWorkspace = ({
         form.reset();
         setIsCreatingWorkspace(false);
         toast.success("Workspace created successfully");
-        navigate(`/workspace/${data._id}`);
+        navigate(`/workspaces/${data._id}`);
       },
       onError: (error: any) => {
         const errorMessage = error.response.data.message;

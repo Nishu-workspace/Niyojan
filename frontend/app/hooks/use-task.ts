@@ -205,3 +205,10 @@ export const useCreateDescriptionMutation = ()=>{
         mutationFn:(data: {taskId: string; description: string})=> updateData(`/tasks/${data.taskId}/description`, {description: data.description})
     })
 }
+
+export const useGetMyTasksQuery = ()=>{
+  return useQuery({
+    queryKey: ["my-tasks", "user"],
+    queryFn: ()=> fetchData("/tasks/my-tasks")
+  })
+}
