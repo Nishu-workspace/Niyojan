@@ -46,8 +46,8 @@ const DashboardLayout = () => {
       <SidebarComponent currentWorkspace={currentWorkspace} />
       <div className="flex flex-1 flex-col h-col">
         <Header
-          onWorkspaceSelected={() => {}}
-          selectedWorkspace={null}
+          onWorkspaceSelected={handleWorkspaceSelected}
+          selectedWorkspace={currentWorkspace}
           onCreateWorkspace={() => setIsCreatingWorkspace(true)}
         />
         <main className="flex-1 overflow-y-auto h-full w-full">
