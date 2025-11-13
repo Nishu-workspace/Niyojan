@@ -14,6 +14,7 @@ import {
   useAchievedTaskMutation,
   useTaskByIdQuery,
   useWatchTaskMutation,
+  useDeleteTaskMutation,
 } from "@/hooks/use-task";
 import { useAuth } from "@/provider/auth-context";
 import type { Project, Task } from "@/types";
@@ -56,6 +57,7 @@ const TaskDetails = () => {
   const { mutate: watchTask, isPending: isWatching } = useWatchTaskMutation();
   const { mutate: achievedTask, isPending: isAchieved } =
     useAchievedTaskMutation();
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskMutation();
 
   const { task, project } = data;
   const isUserWatching = task?.watchers?.some(
@@ -92,6 +94,31 @@ const TaskDetails = () => {
       }
     );
   };
+
+  const handleDeleteTask = () => {
+    if (
+      !confirm(
+        "Are you sure you want to delete this task? This action cannot be undone."
+      )
+    ) {
+      return;
+    }
+    deleteTask(
+      { taskId: task._id },
+      {
+        onSuccess: () => {
+          toast.success("Task deleted");
+          navigate(`/workspaces/${workspaceId}/projects/${projectId}`);
+        },
+        onError: (error: any) => {
+          const errorMessage =
+            error?.response?.data?.message || "Failed to delete task";
+          toast.error(errorMessage);
+        },
+      }
+    );
+  };
+
   return (
     <div className="container mx-auto p-0 py-4 md:px-4">
       <div className="flex flex-col md:flex-row items-center justify-between mb-6">
@@ -143,8 +170,8 @@ const TaskDetails = () => {
                     task.priority === "High"
                       ? "destructive"
                       : task.priority === "Medium"
-                        ? "default"
-                        : "outline"
+                      ? "default"
+                      : "outline"
                   }
                   className="mb-2 capitalize"
                 >
@@ -163,10 +190,34 @@ const TaskDetails = () => {
                 <Button
                   variant={"destructive"}
                   size={"sm"}
-                  onClick={() => {}}
+                  onClick={() => {
+                    if (
+                      !confirm(
+                        "Are you sure you want to delete this task? This action cannot be undone."
+                      )
+                    ) {
+                      return;
+                    }
+                    deleteTask(
+                      { taskId: task._id },
+                      {
+                        onSuccess: () => {
+                          toast.success("Task deleted");
+                          navigate(`/workspaces/${workspaceId}/projects/${projectId}`);
+                        },
+                        onError: (error: any) => {
+                          const errorMessage =
+                            error?.response?.data?.message ||
+                            "Failed to delete task";
+                          toast.error(errorMessage);
+                        },
+                      }
+                    );
+                  }}
                   className="hidden md:block"
+                  disabled={isDeleting}
                 >
-                  Delete Task
+                  {isDeleting ? "Deleting..." : "Delete Task"}
                 </Button>
               </div>
             </div>
