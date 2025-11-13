@@ -1,6 +1,6 @@
 import type { WorkspaceForm } from "@/components/workspace/create-workspace"
-import { fetchData, postData } from "@/lib/fetch-util"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import { deleteData, fetchData, postData } from "@/lib/fetch-util"
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { da } from "zod/v4/locales"
 
 export const useCreateWorkspace = ()=>{
@@ -64,5 +64,27 @@ export const useAcceptGenerateInviteMutation = () => {
   return useMutation({
     mutationFn: (workspaceId: string) =>
       postData(`/workspaces/${workspaceId}/accept-generate-invite`, {}),
+  });
+};
+
+export const useRemoveWorkspaceMemberMutation = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: { workspaceId: string; memberId: string }) =>
+      deleteData(
+        `/workspaces/${data.workspaceId}/members/${data.memberId}`
+      ),
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", variables.workspaceId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", variables.workspaceId, "details"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["workspace", variables.workspaceId, "stats"],
+      });
+    },
   });
 };

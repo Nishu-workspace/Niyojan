@@ -3,6 +3,7 @@ import {
   inviteMemberSchema,
   tokenSchema,
   workspaceSchema,
+  workspaceMemberParamsSchema,
 } from "../libs/validate-schema.js";
 import { validateRequest } from "zod-express-middleware";
 import authMiddleware from "../middleware/auth-middleware.js";
@@ -15,6 +16,7 @@ import {
   getWorkspaces,
   getWorkspaceStats,
   inviteUserToWorkspace,
+  removeWorkspaceMember,
 } from "../controllers/workspace.js";
 import z from "zod";
 
@@ -59,5 +61,14 @@ router.get("/:workspaceId", authMiddleware, getWorkspaceDetails);
 router.get("/:workspaceId/projects", authMiddleware, getWorkspaceProjects);
 
 router.get("/:workspaceId/stats", authMiddleware, getWorkspaceStats);
+
+router.delete(
+  "/:workspaceId/members/:memberId",
+  authMiddleware,
+  validateRequest({
+    params: workspaceMemberParamsSchema,
+  }),
+  removeWorkspaceMember
+);
 
 export default router;

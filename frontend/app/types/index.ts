@@ -9,6 +9,8 @@ export interface User {
   updatedAt: Date;
   profilePicture?:string;
 }
+export type WorkspaceMemberRole = "owner" | "admin" | "member" | "viewer";
+
 export interface Workspace {
   _id:string,
   name:string,
@@ -17,7 +19,7 @@ export interface Workspace {
   color: string;
   members: {
     user: User ;
-    role:"admin" | "member" | "owner" | "veiwer";
+    role: WorkspaceMemberRole;
     joinedAt: Date;
   }[];
   createdAt: Date;
@@ -42,7 +44,7 @@ export interface Project {
   tasks: Task[];
   members:{
     user: User;
-    role: "admin" | "member" | "owner" | "viewer";
+    role: WorkspaceMemberRole;
   }
   createdAt: Date;
   updatedAt: Date;
@@ -95,7 +97,7 @@ export interface Task {
 export interface MembersProps {
   _id:string;
   user: User;
-  role: "admin" | 'member' | 'owner' | "viewer";
+  role: WorkspaceMemberRole;
   joinedAt:Date
 }
 

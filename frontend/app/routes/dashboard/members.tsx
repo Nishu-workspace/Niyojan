@@ -19,20 +19,26 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useGetMyTasksQuery } from "@/hooks/use-task";
-import { useGetWorkspaceDetailsQuery } from "@/hooks/use-workspace";
-import type { Task, Workspace } from "@/types";
-import { format } from "date-fns";
-import { ArrowUpRight, CheckCircle, Clock, FilterIcon } from "lucide-react";
-import React, { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router";
+import {
+  useGetWorkspaceDetailsQuery,
+  useRemoveWorkspaceMemberMutation,
+} from "@/hooks/use-workspace";
+import { useAuth } from "@/provider/auth-context";
+import type { Workspace, WorkspaceMemberRole } from "@/types";
+import { Loader2, MoreVertical } from "lucide-react";
+import React, { useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
+import { useSearchParams } from "react-router";
 
 const Members = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const { user } = useAuth();
   const workspaceId = searchParams.get("workspaceId");
   const initialSearch = searchParams.get("search") || "";
   const [search, setSearch] = useState<string>(initialSearch);
+  const [removingMemberId, setRemovingMemberId] = useState<string | null>(null);
+
+  const removeMemberMutation = useRemoveWorkspaceMemberMutation();
 
   useEffect(() => {
     const params: Record<string, string> = {};
@@ -56,6 +62,87 @@ const Members = () => {
     isLoading: boolean;
   };
 
+  const workspaceMembers = data?.members ?? [];
+
+  const privilegedMembers = useMemo(
+    () =>
+      workspaceMembers.filter((member) =>
+        ["owner", "admin"].includes(member.role)
+      ),
+    [workspaceMembers]
+  );
+
+  const currentUserRole: WorkspaceMemberRole | null = useMemo(() => {
+    if (!user) return null;
+
+    const membership = workspaceMembers.find(
+      (member) => member.user._id === user._id
+    );
+
+    return membership?.role ?? null;
+  }, [user, workspaceMembers]);
+
+  const canManageMembers = !!currentUserRole
+    ? ["owner", "admin"].includes(currentUserRole)
+    : false;
+
+  const filteredMembers = useMemo(
+    () =>
+      workspaceMembers.filter(
+        (member) =>
+          member.user.name.toLowerCase().includes(search.toLowerCase()) ||
+          member.user.email.toLowerCase().includes(search.toLowerCase()) ||
+          member.role?.toLowerCase().includes(search.toLowerCase())
+      ),
+    [workspaceMembers, search]
+  );
+
+  const canRemoveMember = (member: Workspace["members"][number]) => {
+    const isMemberRole = ["member", "viewer"].includes(member.role);
+    const isSelf = user?._id === member.user._id;
+    const hasAnotherPrivileged = privilegedMembers.some(
+      (privileged) => privileged.user._id !== member.user._id
+    );
+
+    if (!isMemberRole) return false;
+
+    if (isSelf) {
+      return hasAnotherPrivileged;
+    }
+
+    return canManageMembers;
+  };
+
+  const handleRemoveMember = async (member: Workspace["members"][number]) => {
+    if (!workspaceId) return;
+
+    if (!canRemoveMember(member)) {
+      toast.error("You are not authorized to remove this member.");
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Removing ${member.user.name} will revoke their access to all workspace projects and tasks. Do you want to continue?`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setRemovingMemberId(member._id);
+      await removeMemberMutation.mutateAsync({
+        workspaceId,
+        memberId: member._id,
+      });
+      toast.success(`${member.user.name} has been removed from the workspace.`);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || "Failed to remove member.";
+      toast.error(message);
+    } finally {
+      setRemovingMemberId(null);
+    }
+  };
+
   if (isLoading)
     return (
       <div>
@@ -64,13 +151,6 @@ const Members = () => {
     );
 
   if (!data || !workspaceId) return <div>No workspace found</div>;
-
-  const filteredMembers = data?.members?.filter(
-    (member) =>
-      member.user.name.toLowerCase().includes(search.toLowerCase()) ||
-      member.user.email.toLowerCase().includes(search.toLowerCase()) ||
-      member.role?.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
     <div className="space-y-6">
@@ -97,7 +177,7 @@ const Members = () => {
             <CardHeader>
               <CardTitle>Members</CardTitle>
               <CardDescription>
-                {filteredMembers?.length} members in your workspace
+                {filteredMembers.length} members in your workspace
               </CardDescription>
             </CardHeader>
 
@@ -123,7 +203,7 @@ const Members = () => {
                       </div>
                     </div>
 
-                    <div className="flex items-center space-x-1 ml-11 md:ml-0">
+                    <div className="flex items-center gap-2 ml-11 md:ml-0">
                       <Badge
                         variant={
                           ["admin", "owner"].includes(member.role)
@@ -136,6 +216,38 @@ const Members = () => {
                       </Badge>
 
                       <Badge variant={"outline"}>{data.name}</Badge>
+
+                      {canRemoveMember(member) && (
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              disabled={
+                                removeMemberMutation.isPending &&
+                                removingMemberId === member._id
+                              }
+                            >
+                              {removeMemberMutation.isPending &&
+                              removingMemberId === member._id ? (
+                                <Loader2 className="size-4 animate-spin" />
+                              ) : (
+                                <MoreVertical className="size-4" />
+                              )}
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="text-destructive focus:text-destructive"
+                              onClick={() => handleRemoveMember(member)}
+                            >
+                              Remove from workspace
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -148,7 +260,7 @@ const Members = () => {
         <TabsContent value="board">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {filteredMembers.map((member) => (
-              <Card key={member.user._id} className="">
+              <Card key={member.user._id}>
                 <CardContent className="p-6 flex flex-col items-center text-center">
                   <Avatar className="bg-gray-500 size-20 mb-4">
                     <AvatarImage src={member.user.profilePicture} />
@@ -171,9 +283,28 @@ const Members = () => {
                         ? "destructive"
                         : "secondary"
                     }
+                    className="capitalize"
                   >
                     {member.role}
                   </Badge>
+
+                  {canRemoveMember(member) && (
+                    <Button
+                      variant="ghost"
+                      className="mt-4"
+                      onClick={() => handleRemoveMember(member)}
+                      disabled={
+                        removeMemberMutation.isPending &&
+                        removingMemberId === member._id
+                      }
+                    >
+                      {removeMemberMutation.isPending &&
+                      removingMemberId === member._id ? (
+                        <Loader2 className="mr-2 size-4 animate-spin" />
+                      ) : null}
+                      Remove from workspace
+                    </Button>
+                  )}
                 </CardContent>
               </Card>
             ))}

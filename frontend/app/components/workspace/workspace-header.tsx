@@ -1,4 +1,4 @@
-import type { User, Workspace } from "@/types";
+import type { User, Workspace, WorkspaceMemberRole } from "@/types";
 import { WorkspaceAvatar } from "./workspace-avatar";
 import { Button } from "../ui/button";
 import { Plus, UserPlusIcon } from "lucide-react";
@@ -9,7 +9,7 @@ interface WorkspaceHeaderProps {
   members: {
     _id: string;
     user: User;
-    role: "admin" | "member" | "owner" | "viewver";
+    role: WorkspaceMemberRole;
     joinedAt: Date;
   }[];
   onCreateProject: () => void;

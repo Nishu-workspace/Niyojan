@@ -41,6 +41,11 @@ const workspaceSchema = z.object({
   color: z.string().min(1, "Color is required"),
 });
 
+const workspaceMemberParamsSchema = z.object({
+  workspaceId: z.string().min(1, "Workspace id is required"),
+  memberId: z.string().min(1, "Member id is required"),
+});
+
 const projectSchema = z.object({
   title: z.string().min(3, "Title is required"),
   description: z.string().optional(),
@@ -83,4 +88,5 @@ export {
   taskSchema,
   inviteMemberSchema,
   tokenSchema,
+  workspaceMemberParamsSchema,
 };
