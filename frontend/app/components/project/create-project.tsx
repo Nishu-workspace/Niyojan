@@ -27,16 +27,19 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  
 } from "../ui/select";
-import { Popover, PopoverTrigger } from "../ui/popover";
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
-import { Calendar } from "../ui/calendar";
+
 import { format } from "date-fns";
-import { PopoverContent } from "@radix-ui/react-popover";
-import { CalendarIcon } from "lucide-react";
+// import { PopoverContent } from "@radix-ui/react-popover";
+// import { CalendarIcon } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
 import { UseCreateProject } from "@/hooks/use-projects";
 import { toast } from "sonner";
+import { Calendar } from "../ui/calendar";
+import { CalendarIcon } from "lucide-react";
 
 interface CreateProjectDialogProps {
   isOpen: boolean;

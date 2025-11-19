@@ -22,8 +22,8 @@ import {
 } from "../ui/form";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
-import { Select, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
-import { SelectContent } from "@radix-ui/react-select";
+import { Select, SelectItem, SelectTrigger, SelectValue, SelectContent } from "../ui/select";
+// import { SelectContent } from "@radix-ui/react-select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Button } from "../ui/button";
 import { CalendarIcon } from "lucide-react";

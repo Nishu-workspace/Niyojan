@@ -1,0 +1,81 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --background: oklch(0.98 0.002 220);
+  --foreground: oklch(0.15 0.01 240);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.15 0.01 240);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.15 0.01 240);
+  --primary: oklch(0.35 0.15 270);
+  --primary-foreground: oklch(0.99 0.001 0);
+  --secondary: oklch(0.95 0.005 220);
+  --secondary-foreground: oklch(0.2 0.008 240);
+  --muted: oklch(0.9 0.003 220);
+  --muted-foreground: oklch(0.5 0.006 240);
+  --accent: oklch(0.6 0.2 280);
+  --accent-foreground: oklch(0.99 0.001 0);
+  --destructive: oklch(0.577 0.245 27.325);
+  --destructive-foreground: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.002 220);
+  --input: oklch(0.96 0.002 220);
+  --ring: oklch(0.6 0.2 280);
+  --chart-1: oklch(0.6 0.2 280);
+  --chart-2: oklch(0.65 0.15 200);
+  --chart-3: oklch(0.55 0.18 260);
+  --chart-4: oklch(0.7 0.12 40);
+  --chart-5: oklch(0.75 0.1 120);
+  --radius: 0.625rem;
+}
+
+.dark {
+  --background: oklch(0.12 0.01 240);
+  --foreground: oklch(0.95 0.003 220);
+  --card: oklch(0.16 0.008 240);
+  --card-foreground: oklch(0.95 0.003 220);
+  --popover: oklch(0.16 0.008 240);
+  --popover-foreground: oklch(0.95 0.003 220);
+  --primary: oklch(0.7 0.18 280);
+  --primary-foreground: oklch(0.12 0.01 240);
+  --secondary: oklch(0.22 0.006 240);
+  --secondary-foreground: oklch(0.95 0.003 220);
+  --muted: oklch(0.25 0.008 240);
+  --muted-foreground: oklch(0.6 0.008 240);
+  --accent: oklch(0.75 0.22 280);
+  --accent-foreground: oklch(0.12 0.01 240);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.22 0.006 240);
+  --input: oklch(0.2 0.008 240);
+  --ring: oklch(0.75 0.22 280);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .transition-smooth {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .dark .glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}

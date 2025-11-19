@@ -262,6 +262,7 @@ const Profile = () => {
 
               <div className="grid gap-2">
                 <FormField
+                
                   control={form.control}
                   name="currentPassword"
                   render={({ field }) => (
