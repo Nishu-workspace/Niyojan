@@ -20,6 +20,7 @@ import {
   updateTaskStatus,
   updateTaskTitle,
   watchTask,
+  getMyArchivedTasks
 } from "../controllers/task.js";
 
 const router = express.Router();
@@ -131,6 +132,7 @@ router.put(
   updateTaskPriority
 );
 router.get("/my-tasks", authMiddleware, getMyTasks);
+router.get("/my-archived-tasks", authMiddleware, getMyArchivedTasks);
 router.get(
   "/:taskId",
   authMiddleware,

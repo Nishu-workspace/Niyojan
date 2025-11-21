@@ -185,7 +185,7 @@ const Profile = () => {
                     // disabled={uploading || isUpdatingProfile}
                     style={{ display: "none" }}
                   />
-                  <Button
+                  {/* <Button
                     type="button"
                     size="sm"
                     variant="outline"
@@ -195,7 +195,7 @@ const Profile = () => {
                     // disabled={uploading || isUpdatingProfile}
                   >
                     Change Avatar
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
               <FormField

@@ -34,8 +34,8 @@ export const SidebarComponent = ({
     { title: "Workspaces", href: "/workspaces", icon: Users },
     { title: "My Tasks", href: "/my-tasks", icon: ListCheck },
     { title: "Members", href: "/members", icon: Users },
-    { title: "Achieved", href: "/achieved", icon: CheckCircle2 },
-    { title: "Settings", href: "/settings", icon: Settings },
+    { title: "Archived", href: "/archived-tasks", icon: CheckCircle2 },
+    //{ title: "Settings", href: "/settings", icon: Settings },
   ];
   return (
     <div

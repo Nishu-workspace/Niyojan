@@ -213,6 +213,14 @@ export const useGetMyTasksQuery = ()=>{
   })
 }
 
+export const useGetMyArchivedTasksQuery = () => {
+  console.log("in archive")
+  return useQuery({
+    queryKey: ["my-archived-tasks", "user"],
+    queryFn: () => fetchData("/tasks/my-archived-tasks"),
+  });
+};
+
 export const useDeleteTaskMutation = () => {
   const queryClient = useQueryClient();
 

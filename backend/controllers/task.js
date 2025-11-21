@@ -611,7 +611,7 @@ const achievedTask = async (req, res) => {
 
     // record activity
     await recordActivity(req.user._id, "updated_task", "Task", taskId, {
-      description: `${isAchieved ? "unachieved" : "achieved"} task ${
+      description: `${isAchieved ? "unarchived" : "archived"} task ${
         task.title
       }`,
     });
@@ -699,6 +699,25 @@ const deleteTask = async (req, res) => {
     });
   }
 };
+
+const getMyArchivedTasks = async (req, res) => {
+  try {
+    const archivedTasks = await Task.find({
+      assignees: { $in: [req.user._id] },
+      isArchived: true,
+    })
+      .populate("project", "title workspace")
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(archivedTasks);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export {
   createTask,
   getTaskById,
@@ -716,4 +735,5 @@ export {
   achievedTask,
   watchTask,
   deleteTask,
+  getMyArchivedTasks
 };

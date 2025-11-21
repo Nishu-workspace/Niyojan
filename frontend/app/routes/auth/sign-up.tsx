@@ -51,6 +51,19 @@ const SignUp = () => {
           <form onSubmit={form.handleSubmit(handleOnSubmit)} className='space-y-6'>
             <FormField
               control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input type="text" placeholder='Samuel Witty' {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -70,19 +83,6 @@ const SignUp = () => {
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder='********' {...field} autoComplete="new-password"/>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input type="text" placeholder='Samuel Witty' {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
