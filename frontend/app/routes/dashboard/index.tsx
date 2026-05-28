@@ -14,12 +14,26 @@ import type {
   WorkspaceProductivityData,
 } from "@/types";
 import { useSearchParams } from "react-router";
+import { Link } from "react-router";
 
 const Dashboard = () => {
   const [searchParams] = useSearchParams();
   const workspaceId = searchParams.get("workspaceId");
   console.log(workspaceId);
-  const { data, isPending } = useGetWorkspaceStatsQuery(workspaceId!) as {
+
+  if (!workspaceId) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">No Workspace Selected</h1>
+          <p className="mb-4">Please select a workspace to view the dashboard.</p>
+          <Link to="/workspaces" className="text-blue-500 underline">Go to Workspaces</Link>
+        </div>
+      </div>
+    );
+  }
+
+  const { data, isPending } = useGetWorkspaceStatsQuery(workspaceId) as {
     data: {
       stats: StatsCardProps;
       taskTrendsData: TaskTrendsData[];

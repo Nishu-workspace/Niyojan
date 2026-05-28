@@ -40,6 +40,11 @@ const TaskDetails = () => {
     };
     isLoading: boolean;
   };
+  const { mutate: watchTask, isPending: isWatching } = useWatchTaskMutation();
+  const { mutate: achievedTask, isPending: isAchieved } =
+    useAchievedTaskMutation();
+  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskMutation();
+
   if (isLoading) {
     return (
       <div>
@@ -54,10 +59,6 @@ const TaskDetails = () => {
       </div>
     );
   }
-  const { mutate: watchTask, isPending: isWatching } = useWatchTaskMutation();
-  const { mutate: achievedTask, isPending: isAchieved } =
-    useAchievedTaskMutation();
-  const { mutate: deleteTask, isPending: isDeleting } = useDeleteTaskMutation();
 
   const { task, project } = data;
   const isUserWatching = task?.watchers?.some(
@@ -86,7 +87,7 @@ const TaskDetails = () => {
       { taskId: task._id },
       {
         onSuccess: () => {
-          toast.success("Task achieved");
+          toast.success("Task archived");
         },
         onError: () => {
           toast.error("Failed to archive task");

@@ -334,7 +334,7 @@ export default function Home() {
               <span className="text-lg font-bold text-foreground tracking-tight">Niyojan</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              © 2025 Niyojan. All rights reserved.
+              © 2026 Niyojan. All rights reserved.
             </p>
           </div>
         </div>
